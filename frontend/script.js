@@ -69,8 +69,8 @@ async function sendMessage() {
             },
             body: JSON.stringify({
                 query: query,
-                session_id: currentSessionId
-            })
+                session_id: currentSessionId,
+            }),
         });
 
         if (!response.ok) throw new Error('Query failed');
