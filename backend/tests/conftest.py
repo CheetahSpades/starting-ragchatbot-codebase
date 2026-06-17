@@ -8,11 +8,11 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import pytest
 import tempfile
+from unittest.mock import MagicMock, patch
 
 
 @pytest.fixture
 def mock_vector_store():
-    from unittest.mock import MagicMock
     return MagicMock()
 
 
@@ -34,3 +34,27 @@ def mock_config():
         CHUNK_OVERLAP = 100
         MAX_HISTORY = 2
     return C()
+
+
+@pytest.fixture
+def mock_rag_system():
+    mock = MagicMock()
+    mock.query.return_value = ("Test answer", [])
+    mock.get_course_analytics.return_value = {
+        "total_courses": 0,
+        "course_titles": [],
+    }
+    mock.session_manager.create_session.return_value = "test-session-id"
+    return mock
+
+
+@pytest.fixture
+def api_client(mock_rag_system):
+    """TestClient for the FastAPI app with RAGSystem and StaticFiles mocked out."""
+    sys.modules.pop("app", None)
+
+    with patch("rag_system.RAGSystem", return_value=mock_rag_system), \
+         patch("fastapi.staticfiles.StaticFiles", MagicMock()):
+        import app as _app_module
+        from starlette.testclient import TestClient
+        return TestClient(_app_module.app)
