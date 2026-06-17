@@ -5,7 +5,7 @@ const API_URL = '/api';
 let currentSessionId = null;
 
 // DOM elements
-let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatBtn;
+let chatMessages, chatInput, sendButton, totalCourses, courseTitles, newChatBtn, themeToggle;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -16,14 +16,39 @@ document.addEventListener('DOMContentLoaded', () => {
     totalCourses = document.getElementById('totalCourses');
     courseTitles = document.getElementById('courseTitles');
     newChatBtn = document.getElementById('newChatBtn');
+    themeToggle = document.getElementById('themeToggle');
 
+    syncThemeAriaLabel();
     setupEventListeners();
     createNewSession();
     loadCourseStats();
 });
 
+// Theme helpers
+function syncThemeAriaLabel() {
+    if (!themeToggle) return;
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    themeToggle.setAttribute('aria-label', current === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    html.classList.add('theme-transitioning');
+
+    const next = (html.getAttribute('data-theme') || 'dark') === 'light' ? 'dark' : 'light';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+
+    syncThemeAriaLabel();
+
+    setTimeout(() => html.classList.remove('theme-transitioning'), 350);
+}
+
 // Event Listeners
 function setupEventListeners() {
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
+
     // Chat functionality
     sendButton.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', (e) => {
