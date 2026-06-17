@@ -111,6 +111,29 @@ header h1 {
     margin-bottom: 0;
 }
 
+.new-chat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    letter-spacing: 0.3px;
+    transition: background 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.new-chat-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+}
+
 /* Main Chat Area */
 .chat-main {
     flex: 1;
@@ -241,8 +264,37 @@ header h1 {
 }
 
 .sources-content {
-    padding: 0 0.5rem 0.25rem 1.5rem;
+    padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.source-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.75rem;
     color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.source-chip:hover {
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+    background: var(--surface-hover);
+}
+
+.source-chip::before {
+    content: '↗';
+    font-size: 0.65rem;
+    opacity: 0.7;
 }
 
 /* Markdown formatting styles */

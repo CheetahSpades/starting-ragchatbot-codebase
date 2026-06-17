@@ -104,7 +104,10 @@ class CourseSearchTool(Tool):
             source = course_title
             if lesson_num is not None:
                 source += f" - Lesson {lesson_num}"
-            sources.append(source)
+            url = None
+            if lesson_num is not None:
+                url = self.store.get_lesson_link(course_title, lesson_num)
+            sources.append({"text": source, "url": url})
             
             formatted.append(f"{header}\n{doc}")
         
@@ -112,6 +115,48 @@ class CourseSearchTool(Tool):
         self.last_sources = sources
         
         return "\n\n".join(formatted)
+
+class CourseOutlineTool(Tool):
+    """Tool for retrieving the full outline of a course"""
+
+    def __init__(self, vector_store: VectorStore):
+        self.store = vector_store
+
+    def get_tool_definition(self) -> Dict[str, Any]:
+        return {
+            "name": "get_course_outline",
+            "description": "Get the full outline of a course: its title, link, and numbered lesson list",
+            "input_schema": {
+                "type": "object",
+                "properties": {
+                    "course_name": {
+                        "type": "string",
+                        "description": "Course title or partial name (e.g. 'MCP', 'Introduction')"
+                    }
+                },
+                "required": ["course_name"]
+            }
+        }
+
+    def execute(self, course_name: str) -> str:
+        all_courses = self.store.get_all_courses_metadata()
+        query = course_name.lower()
+        match = next(
+            (c for c in all_courses if query in c.get("title", "").lower()),
+            None
+        )
+        if not match:
+            return f"No course found matching '{course_name}'."
+
+        lines = [
+            f"Course: {match['title']}",
+            f"Link: {match.get('course_link', 'N/A')}",
+            "Lessons:"
+        ]
+        for lesson in match.get("lessons", []):
+            lines.append(f"  Lesson {lesson['lesson_number']}: {lesson['lesson_title']}")
+        return "\n".join(lines)
+
 
 class ToolManager:
     """Manages available tools for the AI"""
